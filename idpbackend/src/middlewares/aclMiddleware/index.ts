@@ -1,0 +1,1 @@
+export { aclMiddleware } from './acl';
