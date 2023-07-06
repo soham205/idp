@@ -126,15 +126,10 @@ export const sequelizeWrapper = {
 			throw new Error(makeSequlizeModelError as string);
 		}
 		try {
-			console.log('modelObject', modelObject);
-
-			let test = this.getDatabaseHandler(dbConfig).define(modelName, modelObject, {
+			return this.getDatabaseHandler(dbConfig).define(modelName, modelObject, {
 				timestamps: true,
 				freezeTableName: true
 			});
-			console.log('test', test);
-
-			return test;
 		} catch (createModelError) {
 			throw new Error(createModelError as string);
 		}
