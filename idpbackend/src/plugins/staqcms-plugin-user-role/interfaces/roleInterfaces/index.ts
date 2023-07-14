@@ -26,9 +26,9 @@ interface IRoleBaseService {
 	findAll: (
 		findAllFilterOptions?: FIND_ALL_FILTER_OPTONS_T
 	) => Promise<IModuleServiceResult>;
-	findOne: (_id: string | number) => Promise<IModuleServiceResult>;
-	update: (_id: string | number, updateData: any) => Promise<IModuleServiceResult>;
-	deleteOne: (_id: string | number) => Promise<IModuleServiceResult>;
+	findOne: (id: string | number) => Promise<IModuleServiceResult>;
+	update: (id: string | number, updateData: any) => Promise<IModuleServiceResult>;
+	deleteOne: (id: string | number) => Promise<IModuleServiceResult>;
 	deleteAll: () => Promise<IModuleServiceResult>;
 }
 

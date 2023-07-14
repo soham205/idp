@@ -3,7 +3,7 @@ import { IDecodedToken, IDecodedTokenRequestObject } from '../../plugins/staq-cm
 import { acl } from '../../plugins/staq-cms-plugin-acl';
 import jwt from 'jsonwebtoken';
 import { aclPolicies } from './policies';
-import { BASE_ENDPOINT, JWT_SECRET } from '../../config';
+import { BASE_ENDPOINT, JWT_PROPS } from '../../config';
 
 const aclMiddleware = {
 	attachDecodedTokenToRequest: (app: Express) => {
@@ -13,7 +13,7 @@ const aclMiddleware = {
 				return next();
 			}
 			token = token.split(' ')[1];
-			jwt.verify(token, JWT_SECRET, function (err: unknown, decoded) {
+			jwt.verify(token, JWT_PROPS.JWT_SECRET, function (err: unknown, decoded) {
 				if (err) {
 					console.error(err);
 					return next();

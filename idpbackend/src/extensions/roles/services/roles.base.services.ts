@@ -102,9 +102,9 @@ const VcardBaseServices: IModuleBaseService = {
 				});
 		});
 	},
-	findOne: function (_id: string | number): Promise<IModuleServiceResult> {
+	findOne: function (id: string | number): Promise<IModuleServiceResult> {
 		return new Promise((resolve, reject) => {
-			RolesModel.findAll({ where: { _id } })
+			RolesModel.findAll({ where: { id } })
 				.then((findOneEntryResult) => {
 					resolve({
 						data: findOneEntryResult,
@@ -120,11 +120,11 @@ const VcardBaseServices: IModuleBaseService = {
 				});
 		});
 	},
-	update: function (_id: string | number, updateData: IUpdateRoleEntryFields): Promise<IModuleServiceResult> {
+	update: function (id: string | number, updateData: IUpdateRoleEntryFields): Promise<IModuleServiceResult> {
 		return new Promise((resolve, reject) => {
 			RolesModel.update(updateData, {
 				where: {
-					_id
+					id
 				}
 			})
 				.then((affectedRowCount) => {
@@ -146,9 +146,9 @@ const VcardBaseServices: IModuleBaseService = {
 				});
 		});
 	},
-	deleteOne: function (_id: string | number): Promise<IModuleServiceResult> {
+	deleteOne: function (id: string | number): Promise<IModuleServiceResult> {
 		return new Promise((resolve, reject) => {
-			RolesModel.findAll({ where: { _id } })
+			RolesModel.findAll({ where: { id } })
 				.then((findOneEntryResult) => {
 					resolve({
 						data: findOneEntryResult,

@@ -48,7 +48,7 @@ export interface ICreatePermissionData {
 }
 
 export interface IUpdatePermissionData {
-	_id: string | number;
+	id: string | number;
 	group?: string;
 	module?: string;
 	resource?: string;
@@ -73,9 +73,9 @@ export interface IPermissionServiceResult {
 export interface IInitPermissionServiceProps {
 	create: (createData: any) => Promise<IModuleServiceResult>;
 	findAll: (findAllFilterOptions?: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
-	findOne: (_id: string | number) => Promise<IModuleServiceResult>;
-	update: (_id: string | number, updateData: any) => Promise<IModuleServiceResult>;
-	deleteOne: (_id: string | number) => Promise<IModuleServiceResult>;
+	findOne: (id: string | number) => Promise<IModuleServiceResult>;
+	update: (id: string | number, updateData: any) => Promise<IModuleServiceResult>;
+	deleteOne: (id: string | number) => Promise<IModuleServiceResult>;
 	deleteAll: () => Promise<IModuleServiceResult>;
 }
 

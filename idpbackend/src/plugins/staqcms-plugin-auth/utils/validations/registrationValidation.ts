@@ -4,7 +4,7 @@ import { validateEmail } from './_emailValidation';
 import { validatePasswords } from './_passwordsValidation';
 
 interface IRegisterData {
-	fullname: string;
+	fullName: string;
 	email: string;
 	password: string;
 	password2: string;
@@ -12,7 +12,7 @@ interface IRegisterData {
 
 export const registrationValidations = (data: IRegisterData) => {
 	let errors = [];
-	let nameError = validateName(data.fullname);
+	let nameError = validateName(data.fullName);
 	if (nameError) {
 		errors.push(nameError);
 	}

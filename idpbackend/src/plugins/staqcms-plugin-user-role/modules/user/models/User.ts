@@ -6,13 +6,17 @@ export const UserSchema: IuserSchema[] = [
 		fieldType: 'INTEGER',
 		fieldConstraints: {
 			isPrimary: true,
-			unique: true,
-			allowNull: false
+			unique: true
 		}
 	},
 	{
-		fieldName: 'fullname',
-		fieldType: 'VARCHAR'
+		fieldName: 'fullName',
+		fieldType: 'VARCHAR',
+		fieldConstraints: {
+			isPrimary: false,
+			unique: false,
+			allowNull: true
+		}
 	},
 	{
 		fieldName: 'email',
@@ -40,11 +44,19 @@ export const UserSchema: IuserSchema[] = [
 	},
 	{
 		fieldName: 'isConfirmed',
-		fieldType: 'BOOLEAN'
+		fieldType: 'BOOLEAN',
+		fieldConstraints: {
+			unique: false,
+			defaultValue: false
+		}
 	},
 	{
 		fieldName: 'isPhoneConfirmed',
-		fieldType: 'BOOLEAN'
+		fieldType: 'BOOLEAN',
+		fieldConstraints: {
+			unique: false,
+			defaultValue: false
+		}
 	},
 	{
 		fieldName: 'phoneOTP',
@@ -56,10 +68,18 @@ export const UserSchema: IuserSchema[] = [
 	},
 	{
 		fieldName: 'isPasswordReset',
-		fieldType: 'BOOLEAN'
+		fieldType: 'BOOLEAN',
+		fieldConstraints: {
+			unique: false,
+			defaultValue: false
+		}
 	},
 	{
 		fieldName: 'isDeleted',
-		fieldType: 'BOOLEAN'
+		fieldType: 'BOOLEAN',
+		fieldConstraints: {
+			unique: false,
+			defaultValue: false
+		}
 	}
 ];

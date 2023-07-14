@@ -6,7 +6,7 @@ export type AsyncFunction = (
   req: Request,
   res: Response,
   Next: NextFunction
-) => Promise<void>;
+) => Promise<void | unknown>;
 
 export interface IRouterElement {
   path: string;

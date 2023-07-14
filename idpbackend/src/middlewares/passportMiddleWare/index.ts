@@ -4,7 +4,7 @@ import passport from 'passport';
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 
 import compression from 'compression';
-import { EXPRESS_SESSION_PROPS, JWT_SECRET } from '../../config';
+import { EXPRESS_SESSION_PROPS, JWT_PROPS } from '../../config';
 
 import UserServices from '../../extensions/users/services/users.services';
 
@@ -43,7 +43,7 @@ function applyPassportAuthentication(app: Express) {
 
 	const passportJwtVerify: StrategyOptions = {
 		jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-		secretOrKey: JWT_SECRET
+		secretOrKey: JWT_PROPS.JWT_SECRET
 	};
 
 	passport.use(

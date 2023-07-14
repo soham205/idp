@@ -1,4 +1,3 @@
-import { getUUID } from '../../../utils';
 import { ICreatePermissionEntry } from '../../../extensions/permissions/models/permissions.models';
 import { routerTable } from '../../../routeTable';
 

@@ -95,6 +95,13 @@ export const sequelizeWrapper = {
 								? schemaItem.foreignKeyContraints.referenceFieldName
 								: ''
 					},
+					defaultValue:
+						schemaItem.fieldConstraints &&
+						(typeof schemaItem.fieldConstraints.defaultValue == 'boolean' ||
+							typeof schemaItem.fieldConstraints.defaultValue == 'string' ||
+							typeof schemaItem.fieldConstraints.defaultValue == 'number')
+							? schemaItem.fieldConstraints.defaultValue
+							: null,
 					allowNull:
 						schemaItem.fieldConstraints && typeof schemaItem.fieldConstraints.allowNull === 'boolean'
 							? schemaItem.fieldConstraints.allowNull
@@ -104,20 +111,8 @@ export const sequelizeWrapper = {
 				if (!schemaItem.foreignKeyContraints) {
 					delete modelFieldDetails.references;
 				}
-
-				if (
-					schemaItem.fieldConstraints &&
-					(typeof schemaItem.fieldConstraints.defaultValue == 'boolean' ||
-						typeof schemaItem.fieldConstraints.defaultValue == 'string' ||
-						typeof schemaItem.fieldConstraints.defaultValue == 'number')
-				) {
-					modelFieldDetails.defaultValue =
-						schemaItem.fieldConstraints &&
-						(typeof schemaItem.fieldConstraints.defaultValue == 'boolean' ||
-							typeof schemaItem.fieldConstraints.defaultValue == 'string' ||
-							typeof schemaItem.fieldConstraints.defaultValue == 'number')
-							? schemaItem.fieldConstraints.defaultValue
-							: null;
+				if (schemaItem.fieldConstraints && schemaItem.fieldConstraints.allowNull === true) {
+					delete modelFieldDetails.defaultValue;
 				}
 
 				modelObject = { ...modelObject, ...modelFieldItem };
@@ -126,10 +121,11 @@ export const sequelizeWrapper = {
 			throw new Error(makeSequlizeModelError as string);
 		}
 		try {
-			return this.getDatabaseHandler(dbConfig).define(modelName, modelObject, {
+			let test = this.getDatabaseHandler(dbConfig).define(modelName, modelObject, {
 				timestamps: true,
 				freezeTableName: true
 			});
+			return test;
 		} catch (createModelError) {
 			throw new Error(createModelError as string);
 		}

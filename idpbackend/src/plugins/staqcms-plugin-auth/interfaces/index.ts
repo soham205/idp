@@ -1,13 +1,10 @@
-import { AUTH_EVENT_NAME_E } from '../config/env';
+import { IEmailTemplate } from 'staqcms-plugin-nodemailer-gmail/lib/interfaces';
 
-type JWT_LOGIN_EXPIRES_IN_T = `${number}d`;
-type JWT_VERIFICATION_EXPIRES_IN = `${number}h`;
-type JWT_PASSWORD_RESET_EXPIRES_IN = `${number}m`;
+type EXPIRATION_DURATION_TYPE_T = 'm' | 'h' | 'd' | 'mo' | 'y';
+type JWT_TIME_EXPIRATION_T = `${number}${EXPIRATION_DURATION_TYPE_T}`;
 
-type MAIL_EVENT_EMITTER_T = (mailEvent: string, context: unknown) => void;
+type MAIL_EVENT_EMITTER_T = (mailEvent: AUTH_MAIL_EVENTS_E, context: ITemplateValue) => void;
 type SMS_EVENT_EMITTER_T = (mobileNumber: string, context: unknown) => Promise<void>;
-
-type ORDER_BY_DIRECTION_T = 'asc' | 'desc';
 
 interface IFaceBookLoginProps {
 	AUTH_URL: string;
@@ -22,14 +19,13 @@ interface IAuthConfig {
 	SERVER_URL: string;
 	FRONT_END_URL: string;
 	JWTSecret: string;
-	JWT_LOGIN_EXPIRES_IN: JWT_LOGIN_EXPIRES_IN_T;
-	JWT_VERIFICATION_EXPIRES_IN: JWT_VERIFICATION_EXPIRES_IN;
-	JWT_PASSWORD_RESET_EXPIRES_IN: JWT_PASSWORD_RESET_EXPIRES_IN;
+	JWT_LOGIN_EXPIRES_IN: JWT_TIME_EXPIRATION_T;
+	JWT_VERIFICATION_EXPIRES_IN: JWT_TIME_EXPIRATION_T;
+	JWT_PASSWORD_RESET_EXPIRES_IN: JWT_TIME_EXPIRATION_T;
 }
 
 interface IinitAuthProps {
 	authConfig: IAuthConfig;
-	defaultRoleId: string | number;
 	UserModel: IUserBaseServices;
 	mailEventEmitter: MAIL_EVENT_EMITTER_T;
 	smsEventEmitter: SMS_EVENT_EMITTER_T;
@@ -44,7 +40,7 @@ interface IRoleElement {
 
 interface IUserElement {
 	id: string | number;
-	fullname: string;
+	fullName: string;
 	email: string;
 	newEmail: string;
 	phoneNumber: string;
@@ -66,6 +62,12 @@ interface IAuthServiceResult {
 	success: boolean;
 	data: unknown;
 	msg: string;
+	redirect?:
+		| {
+				url: string;
+				status: number;
+		  }
+		| undefined;
 }
 
 interface IChangeEmailData {
@@ -74,13 +76,13 @@ interface IChangeEmailData {
 }
 
 interface IGetMobileOtpData {
-	_id: string | number;
+	id: string | number;
 	phoneNumber: string;
 }
 
 interface IAuthRegisterData {
-	_id: string | number;
-	fullname: string;
+	id: string | number;
+	fullName: string;
 	email: string;
 	password: string;
 	avtarUrl: string;
@@ -88,15 +90,81 @@ interface IAuthRegisterData {
 	password2: string;
 }
 
+export interface ITemplateValue {
+	toEmail: string;
+	[key: string]: string | number | boolean;
+}
+
+export enum AUTH_MAIL_EVENTS_E {
+	EMAIL_CONFIRMATION_EVENT = 'email_confirmation_event',
+	EMAIL_VERIFIED_EVENT = 'email_verified_event',
+	FORGOT_PASSWORD_EVENT = 'forgot_password_event',
+	EMAIL_RECONFIRMATION_EVENT = 'email_reconfirmation_event',
+	EMAIL_REGISTERED = 'email_registered'
+}
+
+export type AUTH_TEMPLATES_T = {
+	[key in AUTH_MAIL_EVENTS_E]: IEmailTemplate;
+};
+
+export interface ILoginServiceProps {
+	password: string;
+	email: string;
+	reqSource?: string;
+	token?: string;
+	user?: IUserElement;
+	sessionId?: string;
+}
+
+export interface IValidateMobile {
+	id: string;
+	phoneOTP: number;
+}
+
+export interface IConfirmEmailAddress {
+	token: string;
+}
+
+export interface IForgotPassword {
+	email: string;
+}
+
+export interface IResetPassword {
+	token: string;
+}
+export interface IChangePassword {
+	oldPassword: string;
+	resetPasswordToken: string;
+	password: string;
+	password2: string;
+	token?: string
+}
+
 interface IAuthServices {
-	initBaseService: (initAuthBaseServiceProps: IinitAuthProps) => void;
+	/**
+	 *  All of the configurations props
+	 * 
+	 */
+	// authConfig: IAuthConfig;
+	// defaultRoleId: string | number;
+	// UserModel: IUserBaseServices;
+	// mailEventEmitter: MAIL_EVENT_EMITTER_T;
+	// smsEventEmitter: SMS_EVENT_EMITTER_T;
+
+	/**
+	 * Auth services methos
+	 *  
+	 */
 	changeEmail: (changeEmailData: IChangeEmailData) => Promise<IAuthServiceResult>;
 	getMobileOTP: (getMobileOptData: IGetMobileOtpData) => Promise<IAuthServiceResult>;
 	register: (registerData: IAuthRegisterData, isEmailTriggerRequired?: boolean) => Promise<IAuthServiceResult>;
-	facebookLogin: (req: any) => Promise<IAuthServiceResult>;
-	encryptUserPassword: (password: string) => Promise<string>;
-	isPasswordMatching: (password: string, passwordHash: string) => Promise<boolean>;
-	sendMailEvent: (user: IUserElement, emailEvent: AUTH_EVENT_NAME_E) => void;
+	login: (loginProps: ILoginServiceProps) => Promise<IAuthServiceResult>;
+	sendMailEvent: (user: IUserElement, emailEvent: AUTH_MAIL_EVENTS_E) => void;
+	validateMobile: (validateMobileOtpInput: IValidateMobile) => Promise<IAuthServiceResult>;
+	confirmEmailAddress: (confirmEmailAddressInput: IConfirmEmailAddress) => Promise<IAuthServiceResult>;
+	forgotPassword: (forgotPasswordInput: IForgotPassword) => Promise<IAuthServiceResult>;
+	resetPassword: (resetPasswordInput: IResetPassword) => Promise<IAuthServiceResult>;
+	changePassword: (changePasswordInput: IChangePassword) => Promise<IAuthServiceResult>;
 }
 
 type FIND_ALL_FILTER_OPTONS_T = {
@@ -112,9 +180,9 @@ interface IModuleServiceResult {
 interface IUserBaseServices {
 	create: (createData: any) => Promise<IModuleServiceResult>;
 	findAll: (findAllFilterOptions?: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
-	findOne: (_id: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
-	update: (_id: string | number, updateData: any) => Promise<IModuleServiceResult>;
-	deleteOne: (_id: string | number) => Promise<IModuleServiceResult>;
+	findOne: (id: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
+	update: (id: string | number, updateData: any) => Promise<IModuleServiceResult>;
+	deleteOne: (id: string | number) => Promise<IModuleServiceResult>;
 	deleteAll: () => Promise<IModuleServiceResult>;
 	findByCondition: (condition: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
 }

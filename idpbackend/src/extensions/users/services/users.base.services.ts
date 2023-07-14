@@ -107,9 +107,9 @@ const VcardBaseServices: IModuleBaseService = {
 				});
 		});
 	},
-	findOne: function (_id: string | number): Promise<IModuleServiceResult> {
+	findOne: function (id: string | number): Promise<IModuleServiceResult> {
 		return new Promise((resolve, reject) => {
-			UsersModel.findAll({ where: { id: _id } })
+			UsersModel.findAll({ where: { id: id } })
 				.then((findOneEntryResult) => {
 					resolve({
 						data: findOneEntryResult,
@@ -151,9 +151,9 @@ const VcardBaseServices: IModuleBaseService = {
 				});
 		});
 	},
-	deleteOne: function (_id: string | number): Promise<IModuleServiceResult> {
+	deleteOne: function (id: string | number): Promise<IModuleServiceResult> {
 		return new Promise((resolve, reject) => {
-			UsersModel.findAll({ where: { id: _id } })
+			UsersModel.findAll({ where: { id: id } })
 				.then((findOneEntryResult) => {
 					resolve({
 						data: findOneEntryResult,

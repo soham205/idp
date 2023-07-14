@@ -81,7 +81,7 @@ export const permissionController: IPermissionController = {
 		let isSuccess = true;
 		let errorMsg = '';
 		for (let updatePermission of updatePermissions) {
-			let updateResult = await permissionServices.update(updatePermission._id, {
+			let updateResult = await permissionServices.update(updatePermission.id, {
 				...updatePermission
 			});
 			isSuccess = isSuccess && updateResult.success;

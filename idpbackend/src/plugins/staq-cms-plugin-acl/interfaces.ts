@@ -30,7 +30,7 @@ export interface IPoliciyElement {
 
 export interface IDecodedToken {
 	id: string;
-	fullname: string;
+	fullName: string;
 	roles: string[];
 	reqSource?: string;
 	iat: number;

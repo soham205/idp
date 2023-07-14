@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import dotenv from 'dotenv';
 
-import { JWT_SECRET, PORT } from './config';
+import { BASE_ENDPOINT, JWT_PROPS, MAIL_AUTH, PORT, SERVER_PROPS } from './config';
 
 import { routes } from './routes';
 import { middleWares } from './middlewares';
@@ -9,9 +9,9 @@ import { sequelizeWrapper } from './plugins/sequelize-wrapper/sequelizeModelReso
 import { dbConfig } from './config';
 import RolesServices from './extensions/roles/services/roles.services';
 
-import staqcms_plugin_auth from './plugins/staqcms-plugin-auth';
-import UserServices from './extensions/users/services/users.services';
-import { IUserBaseServices } from './plugins/staqcms-plugin-auth/interfaces';
+import { aclPolicies } from './middlewares/aclMiddleware/policies';
+import { acl } from './plugins/staq-cms-plugin-acl';
+import { StaqcmsNodeMailer } from 'staqcms-plugin-nodemailer-gmail';
 
 function killApp() {
 	process.exit(1);
@@ -46,39 +46,27 @@ function connectDatabase() {
 	});
 }
 
-async function initBackendServices() {
-	await RolesServices.init();
-
-	const defaultRoleItem = await RolesServices.getDefaultRole();
-	if (defaultRoleItem && defaultRoleItem.id) {
-		staqcms_plugin_auth.init({
-			authConfig: {
-				FRONT_END_URL: 'sjkfaskjf',
-				JWT_LOGIN_EXPIRES_IN: '10d',
-				JWT_PASSWORD_RESET_EXPIRES_IN: '10m',
-				JWT_VERIFICATION_EXPIRES_IN: '10h',
-				JWTSecret: JWT_SECRET,
-				SERVER_URL: ''
-			},
-			defaultRoleId: defaultRoleItem.id,
-			mailEventEmitter: (arg1, arg2) => {},
-			smsEventEmitter: () => {
-				return new Promise((resolve, reject) => {
-					resolve();
-				});
-			},
-			UserModel: UserServices as unknown as IUserBaseServices
+async function configureAcl() {
+	try {
+		await aclPolicies.updateAclPolicies();
+		let aclList = await aclPolicies.getAclPolicies();
+		acl.config({
+			baseUrl: BASE_ENDPOINT as string,
+			defaultRole: 'public',
+			rules: aclList
 		});
+	} catch (aclConfigError) {
+		throw new Error(('ACL configuration error :: ' + aclConfigError) as string);
 	}
-	// return new Promise<void>((resolve, reject) => {
-	// 	Promise.all([RolesServices.init()])
-	// 		.then(() => {
-	// 			resolve();
-	// 		})
-	// 		.catch((initServicesError) => {
-	// 			reject(initServicesError);
-	// 		});
-	// });
+}
+
+async function initBackendServices() {
+	try {
+		await RolesServices.init();
+		StaqcmsNodeMailer.init(MAIL_AUTH);
+	} catch (initRoleServiceError) {
+		throw new Error(initRoleServiceError as string);
+	}
 }
 
 function startServer(app: Express) {
@@ -89,29 +77,34 @@ function startServer(app: Express) {
 
 const initBackend = (app: Express) => {
 	dotenv.config();
-	const promiseArray: Promise<void>[] = [];
-	
-	middleWares.applyCors(app);
-	promiseArray.push(addRoutes(app));
-	promiseArray.push(connectDatabase());
-
-	Promise.all(promiseArray)
+	connectDatabase()
 		.then(() => {
-			initBackendServices()
-				.then(() => {
-					middleWares.applyMulterMiddleware(app);
-					middleWares.applyAclMiddleware(app);
-					middleWares.applyErrorHandlingMiddleware(app);
+			
+			middleWares.applyCors(app);
 
-					startServer(app);
+			middleWares.applyMulterMiddleware(app);
+
+			middleWares.applyAclMiddleware(app);
+
+			Promise.all([addRoutes(app), configureAcl()])
+				.then(() => {
+					initBackendServices()
+						.then(() => {
+							middleWares.applyErrorHandlingMiddleware(app);
+							startServer(app);
+						})
+						.catch((initServicesError) => {
+							console.error('initServicesError :: ', initServicesError);
+							killApp();
+						});
 				})
-				.catch((initServicesError) => {
-					console.error('initServicesError :: ', initServicesError);
+				.catch((promiseAllError) => {
+					console.error('promiseAllError :: ', promiseAllError);
 					killApp();
 				});
 		})
-		.catch((promiseAllError) => {
-			console.error('promiseAllError :: ', promiseAllError);
+		.catch((dbConnectionError) => {
+			console.error('dbConnectionError :: ', dbConnectionError);
 			killApp();
 		});
 };

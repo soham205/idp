@@ -4,7 +4,7 @@ import { IModelSchema, sequelizeWrapper } from '../../../plugins/sequelize-wrapp
 import { UserRole } from '../../../plugins/staqcms-plugin-user-role';
 
 interface ICreateUserEntry {
-	fullname: string;
+	fullName: string;
 	email: string;
 	password: string;
 }

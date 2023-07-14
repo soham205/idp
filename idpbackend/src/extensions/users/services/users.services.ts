@@ -9,7 +9,7 @@ import { RolesModel } from '../../../extensions/roles/models/roles.models';
 interface IUserServices extends IModuleBaseService {
 	init: () => Promise<void>;
 	// createUserAndAttachRoles: (userData: IAuthRegisterData, roles?: string[] | number[]) => Promise<IModuleServiceResult>;
-	findByCondition: (_id: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
+	findByCondition: (id: FIND_ALL_FILTER_OPTONS_T) => Promise<IModuleServiceResult>;
 }
 
 const UserServices: IUserServices = {
@@ -66,7 +66,7 @@ const UserServices: IUserServices = {
 			// UsersModel.hasMany(UserRoleMappingModel, { foreignKey: 'id' });
 			// RolesModel.hasMany(UserRoleMappingModel, { foreignKey: 'id' });
 
-			UsersModel.findAll({ where: { ...condition }, include: { model: RolesModel } })
+			UsersModel.findOne({ where: { ...condition }, include: { model: RolesModel } })
 				.then((findOneEntryResult) => {
 					resolve({
 						data: JSON.parse(JSON.stringify(findOneEntryResult)),

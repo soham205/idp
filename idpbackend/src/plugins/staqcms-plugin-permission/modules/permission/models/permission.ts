@@ -5,7 +5,7 @@ export const PermissionSchema: IPermissionSchema[] = [
 		fieldName: 'id',
 		fieldType: 'INTEGER',
 		fieldConstraints: {
-			unique: true,
+			unique: false,
 			isPrimary: true,
 			autoIncrement: true
 		}
@@ -34,9 +34,8 @@ export const PermissionSchema: IPermissionSchema[] = [
 		fieldName: 'enable',
 		fieldType: 'BOOLEAN',
 		fieldConstraints: {
-			defaultValue: false,
-			unique: false,
-			allowNull: false
+			defaultValue: 0,
+			unique: false
 		}
 	}
 ];

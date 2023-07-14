@@ -29,7 +29,7 @@ function statFile(filePath: string): Promise<void> {
 
 async function setRouteTable(rootDir: string, routeSuffix: ROUTES_SUFFIXES_E): Promise<IRouteTableEntry[]> {
 	return new Promise((resolve, reject) => {
-		let rooDirLoc = `${__dirname}/${rootDir}`
+		let rooDirLoc = `${__dirname}/${rootDir}`;
 		readDirectory(rooDirLoc)
 			.then((moduleDirectories: string[]) => {
 				const routeTableResult: Promise<IRouteTableEntry[] | null>[] = [];
@@ -110,8 +110,6 @@ async function setRouteTable(rootDir: string, routeSuffix: ROUTES_SUFFIXES_E): P
 													continue;
 												}
 												try {
-
-
 													const importedModule = await import(requiredFile);
 													routeEntries.push({
 														module: moduleName,
@@ -154,9 +152,11 @@ async function setRouteTable(rootDir: string, routeSuffix: ROUTES_SUFFIXES_E): P
 						reject(makeRouteTableError);
 					});
 			})
-			.catch((readRootDirError) => {
-				console.error('readRootDirError :: ', readRootDirError);
-				reject(readRootDirError);
+			.catch(() => {
+				/**
+				 *  If folders root dir dosent exists then there will be no route table.
+				 */
+				resolve([]);
 			});
 	});
 }
@@ -164,15 +164,15 @@ async function setRouteTable(rootDir: string, routeSuffix: ROUTES_SUFFIXES_E): P
 export const routerTable = {
 	getNoBodyParserTable: async (): Promise<IRouteTableEntry[]> => {
 		return new Promise((resolve, reject) => {
-			const promiseArray: Promise<IRouteTableEntry[]>[] = [];
+			const noBodyParserTasks: Promise<IRouteTableEntry[]>[] = [];
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
+			noBodyParserTasks.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
+			noBodyParserTasks.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
 
-			// promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
+			noBodyParserTasks.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.NO_BODY_PARSER_ROUTES_SUFFIX));
 
-			Promise.all(promiseArray)
+			Promise.all(noBodyParserTasks)
 				.then((noBodyParserRoutesResult: IRouteTableEntry[][]) => {
 					return resolve(noBodyParserRoutesResult.flat());
 				})
@@ -184,17 +184,17 @@ export const routerTable = {
 
 	getPreRouteTable: async (): Promise<IRouteTableEntry[]> => {
 		return new Promise((resolve, reject) => {
-			const promiseArray: Promise<IRouteTableEntry[]>[] = [];
+			const preRouteTableTasks: Promise<IRouteTableEntry[]>[] = [];
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
+			preRouteTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
+			preRouteTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
 
-			// promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
+			preRouteTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.PRE_ROUTES_SUFFIX));
 
-			Promise.all(promiseArray)
+			Promise.all(preRouteTableTasks)
 				.then((presRoutesResult: IRouteTableEntry[][]) => {
-					presRoutesResult = presRoutesResult.filter(item => item && item.length > 0)
+					presRoutesResult = presRoutesResult.filter((item) => item && item.length > 0);
 					return resolve(presRoutesResult.flat());
 				})
 				.catch((getRoutesError) => {
@@ -205,17 +205,17 @@ export const routerTable = {
 
 	getRouteTable: async (): Promise<IRouteTableEntry[]> => {
 		return new Promise((resolve, reject) => {
-			const promiseArray: Promise<IRouteTableEntry[]>[] = [];
+			const routeTableTasks: Promise<IRouteTableEntry[]>[] = [];
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
+			routeTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.MODULES, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
 
-			promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
+			routeTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.EXTENSIONS, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
 
-			// promiseArray.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
+			routeTableTasks.push(setRouteTable(ROUTE_LOCATIONS_E.API, ROUTES_SUFFIXES_E.ROUTES_SUFFIX));
 
-			Promise.all(promiseArray)
+			Promise.all(routeTableTasks)
 				.then((routesResult: IRouteTableEntry[][]) => {
-					routesResult = routesResult.filter(item => item && item.length > 0)
+					routesResult = routesResult.filter((item) => item && item.length > 0);
 					return resolve(routesResult.flat());
 				})
 				.catch((getRoutesError) => {
