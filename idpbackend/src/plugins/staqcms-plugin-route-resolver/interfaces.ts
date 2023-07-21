@@ -1,6 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Strategy } from 'passport-jwt';
-import passport, { Authenticator } from 'passport';
 
 type METHOD_TYPE_T = 'get' | 'put' | 'post' | 'delete' | 'patch';
 
