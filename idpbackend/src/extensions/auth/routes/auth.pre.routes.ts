@@ -56,12 +56,6 @@ const authRoutes: IProtectedRouterElement[] = [
 		method: ['post'],
 		pathCallback: authController.changePassword,
 		authenticationStrategy:'jwt'
-	},
-	{
-		path: `'/google/googleCb'`,
-		method: ['post'],
-		pathCallback: authController.googleCbHandler,
-		authenticationStrategy:'google'
 	}
 ];
 
