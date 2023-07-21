@@ -12,6 +12,7 @@ import RolesServices from './extensions/roles/services/roles.services';
 import { aclPolicies } from './middlewares/aclMiddleware/policies';
 import { acl } from './plugins/staq-cms-plugin-acl';
 import { StaqcmsNodeMailer } from 'staqcms-plugin-nodemailer-gmail';
+import passportMiddleWare from './middlewares/passportMiddleWare';
 
 function killApp() {
 	process.exit(1);
@@ -79,29 +80,38 @@ const initBackend = (app: Express) => {
 	dotenv.config();
 	connectDatabase()
 		.then(() => {
-			
 			middleWares.applyCors(app);
 
 			middleWares.applyMulterMiddleware(app);
 
 			middleWares.applyAclMiddleware(app);
+			
+			middleWares.applySessionMiddleware(app);
 
-			Promise.all([addRoutes(app), configureAcl()])
-				.then(() => {
-					initBackendServices()
-						.then(() => {
-							middleWares.applyErrorHandlingMiddleware(app);
-							startServer(app);
-						})
-						.catch((initServicesError) => {
-							console.error('initServicesError :: ', initServicesError);
-							killApp();
-						});
-				})
-				.catch((promiseAllError) => {
-					console.error('promiseAllError :: ', promiseAllError);
-					killApp();
-				});
+			passportMiddleWare.initializePassportMiddleware(app);
+
+			configureAcl();
+
+			addRoutes(app);
+
+			initBackendServices();
+			
+			startServer(app);
+
+			// Promise.all([addRoutes(app), configureAcl()])
+			// 	.then(() => {
+			// 			.then(() => {
+			// 				middleWares.applyErrorHandlingMiddleware(app);
+			// 			})
+			// 			.catch((initServicesError) => {
+			// 				console.error('initServicesError :: ', initServicesError);
+			// 				killApp();
+			// 			});
+			// 	})
+			// 	.catch((promiseAllError) => {
+			// 		console.error('promiseAllError :: ', promiseAllError);
+			// 		killApp();
+			// 	});
 		})
 		.catch((dbConnectionError) => {
 			console.error('dbConnectionError :: ', dbConnectionError);

@@ -1,4 +1,4 @@
-import { IRouterElement } from '../../plugins/staqcms-plugin-route-resolver/interfaces';
+import { IBaseRouterElement, IProtectedRouterElement } from '../../plugins/staqcms-plugin-route-resolver/interfaces';
 
 export enum ROUTES_SUFFIXES_E {
 	ROUTES_SUFFIX = 'routes',
@@ -13,6 +13,6 @@ export enum ROUTE_LOCATIONS_E {
 }
 
 export interface IRouteTableEntry {
-	table: IRouterElement[];
+	table: IProtectedRouterElement[];
 	module: string;
 }

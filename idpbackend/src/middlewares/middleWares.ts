@@ -8,6 +8,7 @@ import { MULTER_PROPS, PUBLIC_DIRECTORY } from '../config';
 import { multerStorage } from './multer';
 import { errorHanlder } from './errorHandler';
 import { aclMiddleware } from './aclMiddleware';
+import { applySession } from './sessionMiddleware/session';
 
 const middleWares = {
 	applyCors: (app: Express) => {
@@ -44,6 +45,10 @@ const middleWares = {
 	applyAclMiddleware: (app: Express) => {
 		aclMiddleware.attachDecodedTokenToRequest(app);
 		aclMiddleware.applyAclMiddleware(app);
+	},
+
+	applySessionMiddleware: (app: Express) => {
+		applySession(app);
 	}
 };
 export { middleWares };

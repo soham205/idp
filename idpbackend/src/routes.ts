@@ -1,5 +1,4 @@
 import { Express } from 'express';
-
 import { routerTable } from './routeTable';
 import { API_VERSION, BASE_ENDPOINT, BODY_PARSER_JSON_SIZE_LIMIT } from './config';
 import bodyParser from 'body-parser';
@@ -49,14 +48,13 @@ export const routes = {
 				);
 			}
 
-			passportMiddleWare.usePassportMiddleware(app);
 
 			let routeTable = await routerTable.getRouteTable();
-
+			
 			for (let routeList of routeTable) {
 				app.use(
 					`${BASE_ENDPOINT}/${API_VERSION}/${routeList.module}`,
-					staq_cms_routeResolve.resolveRoute(routeList.table)
+					staq_cms_routeResolve.resolveProtectedRoute(routeList.table)
 				);
 			}
 		} catch (useRoutesError) {

@@ -103,4 +103,10 @@ export const SERVER_PROPS = {
 			? `${process.env.HTTP_SECURE}://${process.env.SERVER_HOST}:${PORT}`
 			: `${process.env.HTTP_SECURE}://${process.env.SERVER_HOST}`
 };
+
 export const FRONT_END_URL = process.env.FRONT_END_URL || '';
+
+export const GOOGLE_AUTH_PROPS = {
+	GOOGLE_AUTH_ACCESS_ID: process.env.GOOGLE_AUTH_ACCESS_ID || '',
+	GOOGLE_AUTH_SECRET_KEY: process.env.GOOGLE_AUTH_SECRET_KEY || ''
+};
