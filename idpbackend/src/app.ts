@@ -1,7 +1,7 @@
 import { Express } from 'express';
 import dotenv from 'dotenv';
 
-import { BASE_ENDPOINT, JWT_PROPS, MAIL_AUTH, PORT, SERVER_PROPS } from './config';
+import { BASE_ENDPOINT, MAIL_AUTH, PORT } from './config';
 
 import { routes } from './routes';
 import { middleWares } from './middlewares';
@@ -11,8 +11,8 @@ import RolesServices from './extensions/roles/services/roles.services';
 
 import { aclPolicies } from './middlewares/aclMiddleware/policies';
 import { acl } from './plugins/staq-cms-plugin-acl';
-import { StaqcmsNodeMailer } from 'staqcms-plugin-nodemailer-gmail';
 import passportMiddleWare from './middlewares/passportMiddleWare';
+import { StaqcmsNodeMailer } from 'staqcms-plugin-nodemailer-gmail';
 
 function killApp() {
 	process.exit(1);
@@ -76,47 +76,35 @@ function startServer(app: Express) {
 	});
 }
 
-const initBackend = (app: Express) => {
+const initBackend = async (app: Express) => {
 	dotenv.config();
-	connectDatabase()
-		.then(() => {
-			middleWares.applyCors(app);
 
-			middleWares.applyMulterMiddleware(app);
+	try {
+		await connectDatabase();
+	} catch (dbConnectionError) {
+		console.error('dbConnectionError :: ', dbConnectionError);
+		killApp();
+	}
 
-			middleWares.applyAclMiddleware(app);
-			
-			middleWares.applySessionMiddleware(app);
+	middleWares.applyCors(app);
 
-			passportMiddleWare.initializePassportMiddleware(app);
+	middleWares.applyMulterMiddleware(app);
 
-			configureAcl();
+	middleWares.applyAclMiddleware(app);
 
-			addRoutes(app);
+	middleWares.applySessionMiddleware(app);
 
-			initBackendServices();
-			
-			startServer(app);
+	passportMiddleWare.initializePassportMiddleware(app);
 
-			// Promise.all([addRoutes(app), configureAcl()])
-			// 	.then(() => {
-			// 			.then(() => {
-			// 				middleWares.applyErrorHandlingMiddleware(app);
-			// 			})
-			// 			.catch((initServicesError) => {
-			// 				console.error('initServicesError :: ', initServicesError);
-			// 				killApp();
-			// 			});
-			// 	})
-			// 	.catch((promiseAllError) => {
-			// 		console.error('promiseAllError :: ', promiseAllError);
-			// 		killApp();
-			// 	});
-		})
-		.catch((dbConnectionError) => {
-			console.error('dbConnectionError :: ', dbConnectionError);
-			killApp();
-		});
+	await configureAcl();
+
+	await addRoutes(app);
+
+	await initBackendServices();
+
+	middleWares.applyErrorHandlingMiddleware(app);
+
+	startServer(app);
 };
 
 export { initBackend };

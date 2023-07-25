@@ -81,12 +81,12 @@ interface IGetMobileOtpData {
 }
 
 interface IAuthRegisterData {
-	id: string | number;
+	id?: string | number;
 	fullName: string;
 	email: string;
 	password: string;
-	avtarUrl: string;
-	phoneNumber: string;
+	avtarUrl?: string;
+	phoneNumber?: string;
 	password2: string;
 }
 

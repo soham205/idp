@@ -1,6 +1,5 @@
 import passport from 'passport';
 import { Express } from 'express';
-
 import { getPassportJwtStratergy } from './stratergies';
 
 function initializePassport(app: Express) {

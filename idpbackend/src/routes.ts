@@ -4,7 +4,6 @@ import { API_VERSION, BASE_ENDPOINT, BODY_PARSER_JSON_SIZE_LIMIT } from './confi
 import bodyParser from 'body-parser';
 import staq_cms_routeResolve from './plugins/staqcms-plugin-route-resolver';
 
-import passportMiddleWare from './middlewares/passportMiddleWare';
 
 export const routes = {
 	useNoBodyParserRoutes: async (app: Express): Promise<void> => {

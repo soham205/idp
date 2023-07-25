@@ -15,7 +15,7 @@ import {
 } from '../../../plugins/staqcms-plugin-auth/interfaces';
 import UserServices from '../../../extensions/users/services/users.services';
 
-const initAuthProps: IinitAuthProps = {
+export const initAuthProps: IinitAuthProps = {
 	authConfig: {
 		FRONT_END_URL: FRONT_END_URL,
 		JWT_LOGIN_EXPIRES_IN: JWT_PROPS.JWT_LOGIN_EXPIRES_IN,
